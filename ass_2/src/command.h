@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef bool uint_fast8_t;
+typedef uint_fast8_t bool;
 #define true 1
 #define false 0
 
@@ -15,5 +15,3 @@ bool assignSwitchToRouteThrough(uint8_t addr, uint8_t rtaddr);
 bool assignSwitchToRouteOut(uint8_t addr, uint8_t rtaddr);
 
 #endif /* COMMAND_H_20190917_111805 */
-
-
