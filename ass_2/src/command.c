@@ -591,27 +591,27 @@ bool sysNop(void)
 }
 
 bool buildCommand(TARGET_TYPE target, uint_fast8_t address, uint_fast8_t command, uint_fast8_t data) {
-    uint8_t *toTrain = calloc(1, 3);
+    uint8_t toTrain[3] = {0};
     toTrain[0] = 0xFE;
 
     switch (target) {
         case SWITCH_C : {
-            toTrain[1] = (0b01 << 6) + ((address & 0x3F) >> 1);
+            toTrain[1] = (0b01 << 6) + ((address & 0x3F >> 1) & 0x3F);
         }
         case ROUTE : {
-            toTrain[1] = (0b1101 << 4) + ((address & 0x0F) >> 1);
+            toTrain[1] = (0b1101 << 4) + ((address & 0x0F >> 1) & 0x3F);
         }
         case ENGINE: {
-            toTrain[1] = (0b00 << 6) + ((address & 0x3F) >> 1);
+            toTrain[1] = (0b00 << 6) + ((address & 0x3F >> 1) & 0x3F);
         }
         case TRAIN: {
-            toTrain[1] = (0b11001 << 3) + ((address & 0x07) >> 1);
+            toTrain[1] = (0b11001 << 3) + ((address & 0x07 >> 1) & 0x3F);
         }
         case ACCESSORY: {
-            toTrain[1] = (0b10 << 6) + ((address & 0x3F) >> 1);
+            toTrain[1] = (0b10 << 6) + ((address >> 1) & 0x3F);
         }
         case GROUP: {
-            toTrain[1] = (0b1100 << 4) + ((address & 0x0F) >> 1);
+            toTrain[1] = (0b1100 << 4) + ((address >> 1) & 0x0F);
         }
     }
 
