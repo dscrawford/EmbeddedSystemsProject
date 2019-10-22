@@ -9,6 +9,6 @@
 void startTrain();
 void runTrain();
 char getChoice();
-void executeChoice(char, bool*);
+void executeChoice(char, int8_t*, bool*, uint8_t);
 
 #endif

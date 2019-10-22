@@ -11,44 +11,61 @@ void runTrain() {
   printw("Starting program..\n\n");
   char choice = '\0';
   bool trainStarted = false;
+  uint8_t trainAddr = 0b1010;
+  int8_t speed = 0;
   while (choice != 'e') {
     choice = getChoice();
-    if (choice == '0') {
-      printw("Error: Invalid choice\n");
-      continue;
-      clear();
-    }
     clear();
-    executeChoice(choice, &trainStarted);
+    if (choice == '0') {
+      printw("Error: Invalid choice\n\n");
+      continue;
+    }
+    executeChoice(choice, &speed, &trainStarted, trainAddr);
   }
 }
 
-void executeChoice(char choice, bool* trainStarted) {
+void executeChoice(char choice, int8_t* speed,
+		   bool* trainStarted, uint8_t trainAddr) {
+  if (choice != ' ' && !*trainStarted) {
+    printw("Error: Train not yet started\n\n");
+    return;
+  }
   switch (choice) {
   case ' ':
     //Check if train is already started
     if (!*trainStarted) {
       printw("Starting train..\n");
-      
     }
     else {
+      sysHalt();
       printw("Stopping train..\n");
     }
     *trainStarted = !(*trainStarted);
     break;
   case 'r':
+    trainRingBell(trainAddr);
     printw("Ringing the bell..\n");
     break;
   case 'w':
-    printw("Accelerating the train..\n");
+    if (*speed != 5) {
+      *speed += 1;
+      engineSetRelSpeed(trainAddr, *speed);
+      printw("Accelerating the train..\n");
+    }
     break;
   case 'm':
+    trainFwdDir(trainAddr);
     printw("Moving the train..\n");
     break;
   case 's':
-    printw("Decelerating the train..\n");
+    if (*speed != -5) {
+      *speed -= 1;
+      engineSetRelSpeed(trainAddr, *speed);
+      printw("Decelerating the train..\n");
+    }
     break;
   case 'e':
+    sysHalt();
     printw("Exiting program and stopping train..");
     break;
   }

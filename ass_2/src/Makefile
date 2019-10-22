@@ -3,7 +3,7 @@ CXX=gcc
 CC=gcc
 CXXFLAGS=-Wall
 CPPFLAGS=-Wall
-FILES=ui.c main.c
+FILES=ui.c main.c command.c
 
 all: $(EXEC)
 
