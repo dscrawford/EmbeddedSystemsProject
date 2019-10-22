@@ -11,4 +11,4 @@ clean:
 	rm -rf *~ *.o \#* $(EXEC)
 
 $(EXEC): $(FILES)
-	$(CXX) $(CXXFLAGS) $(OBJS) $(FILES) -o $(EXEC)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(FILES) -o $(EXEC) -lncurses
