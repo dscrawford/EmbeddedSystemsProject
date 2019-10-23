@@ -44,7 +44,7 @@ int init_serial () {
      * no parity
      */
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    if (!GetCommState(hserial, &dcbSerialParams)) {
+    if (!GetCommState(hSerial, &dcbSerialParams)) {
         printf("Error getting device state\n");
         CloseHandle(hSerial);
 
@@ -67,7 +67,7 @@ int init_serial () {
     timeouts.ReadTotalTimeoutConstant = 50;
     timeouts.ReadTotalTimeoutMultiplier = 10;
     timeouts.WriteTotalTimeoutConstant = 50;
-    timeouts.WriteTotalTimeoutMultilier = 10;
+    timeouts.WriteTotalTimeoutMultiplier = 10;
     if (!SetCommTimeouts(hSerial, &timeouts)) {
         printf("Error setting timeouts\n");
         CloseHandle(hSerial);
@@ -103,9 +103,10 @@ uint32_t send_serial (const uint8_t *cmd) {
     printf("\n");
 
     if (!WriteFile(hSerial, cmd, 3, &ret, NULL)) {
-        printf("Error writing to port");
+        printf("Error writing to port\n");
         ret = 0;
     } else {
+        ret = 3;
         printf("%u bytes written\n", ret);
     }
 

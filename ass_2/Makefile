@@ -15,7 +15,7 @@ LFLAGS := -lncurses
 # Modify flags and set up windows versus unix building
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -DWINDOWS -DPDC_DLL_BUILD -DHAVE_NO_INFOEX
-	LFLAGS := pdcurses.dll
+	LFLAGS := $(BIN_DIR)/pdcurses.dll
 	UNIX := 0
 	SHELL := cmd.exe
 else ifeq ($(shell uname -s), Darwin)

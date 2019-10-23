@@ -1,5 +1,5 @@
 #include "ui.h"
-#include <ncurses.h>
+#include <curses.h>
 
 int main() {
   startTrain();
