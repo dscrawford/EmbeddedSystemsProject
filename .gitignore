@@ -10,7 +10,7 @@
 *~
 
 # Include pdcurses.dll
-!bin/pdcurses.dll
+!*/bin/pdcurses.dll
 
 
 
