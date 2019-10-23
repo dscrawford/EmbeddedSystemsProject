@@ -1,7 +1,8 @@
-#include "command.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "command.h"
+#include "sereial.h"
 
 typedef enum {
     SWITCH_C,
@@ -771,22 +772,14 @@ bool sysHalt(void)
 {
     // 1111 1111 1111 1111
     uint8_t toTrain[3] = {0xFE, 0xFF, 0xFF};
-    printf("sending: 0x%02X%02X%02X", toTrain[0], toTrain[1], toTrain[2]);
-    
-    //TODO Oskari's serial write
-
-    return false; //TODO CHANGE
+    return ((send_serial(toTrain)) ? true : false);
 }
 
 bool sysNop(void)
 {
     // 1111 1111 1000 0000
     uint8_t toTrain[3] = {0xFE, 0xFF, 0x80};
-    printf("sending: 0x%02X%02X%02X", toTrain[0], toTrain[1], toTrain[2]);
-    
-    //TODO Oskari's serial write
-
-    return false; //TODO CHANGE
+    return ((send_serial(toTrain)) ? true : false);
 }
 
 bool buildCommand(TARGET_TYPE target, uint_fast8_t address, uint_fast8_t command, uint_fast8_t data) {
@@ -816,9 +809,5 @@ bool buildCommand(TARGET_TYPE target, uint_fast8_t address, uint_fast8_t command
 
     toTrain[2] = ((address & 1) << 7) + ((command) & 0x3 << 5) + (data & 0x1F);
 
-    printf("sending: 0x%02X%02X%02X", toTrain[0], toTrain[1], toTrain[2]);
-
-    //TODO Oskari's serial write
-
-    return false; //TODO CHANGE
+    return ((send_serial(toTrain)) ? true : false);
 }
