@@ -3,17 +3,19 @@ TOP_DIR := $(abspath .)
 SRC_DIR := $(TOP_DIR)/src
 DEP_DIR := $(TOP_DIR)/dep
 OBJ_DIR := $(TOP_DIR)/build
+BIN_DIR := $(TOP_DIR)/bin
 INC_DIR := $(TOP_DIR)/include
 
 # Set up basic flags
 GCC := gcc
-EXE := program
-CFLAGS := -std=c99 -Wall -Wextra -pedantic-errors -I$(INC_DIR)
+EXE := $(BIN_DIR)/program
+CFLAGS := -std=c99 -Wall -Wextra -pedantic -I$(INC_DIR)
 LFLAGS := -lncurses
 
 # Modify flags and set up windows versus unix building
 ifeq ($(OS),Windows_NT)
-	CFLAGS += -DWINDOWS
+	CFLAGS += -DWINDOWS -DPDC_DLL_BUILD -DHAVE_NO_INFOEX
+	LFLAGS := pdcurses.dll
 	UNIX := 0
 else ifeq ($(shell uname -s), Darwin)
 	CFLAGS += -DMACOSX
@@ -45,9 +47,9 @@ DOBJ := $(addprefix $(OBJ_DIR).dbg/,$(patsubst %.c,%.o,$(SRC)))
 
 all: debug release
 
-release: $(OBJ_DIR) includes $(EXE)
+release: $(OBJ_DIR) $(BIN_DIR) includes $(EXE).exe
 
-debug: $(OBJ_DIR).dbg includes $(EXE).dbg
+debug: $(OBJ_DIR).dbg $(BIN_DIR) includes $(EXE).dbg
 
 includes: $(INC_DIR) $(INC)
 
@@ -59,7 +61,7 @@ $(OBJ_DIR)/%.o: %.c
 $(OBJ_DIR).dbg/%.o: %.c
 	$(GCC) -c $(CFLAGS) -g -DDEBUG_ -o $@ $<
 
-$(EXE): $(OBJ)
+$(EXE).exe: $(OBJ)
 	$(GCC) -o $@ $^ $(LFLAGS)
 
 $(EXE).dbg: $(DOBJ)

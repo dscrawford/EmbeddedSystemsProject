@@ -47,6 +47,7 @@
 
 # Executables
 *.exe
+*.dbg
 *.out
 *.app
 *.i*86
