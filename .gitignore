@@ -9,6 +9,9 @@
 *.vim
 *~
 
+# Include pdcurses.dll
+!/bin/pdcurses.dll
+
 
 
 # Created by https://www.gitignore.io/api/c,c++,clion
