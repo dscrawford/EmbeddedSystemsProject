@@ -1,81 +1,21 @@
+#include <ctype.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+#include <windows.h>
+
+#include "curses.h"
+
+#include "command.h"
+#include "serial.h"
 #include "ui.h"
 
-void startTrain() {
-  initscr();
-  raw();
-  runTrain();
-  endwin();
-}
-
-void runTrain() {
-  printw("Starting program..\n\n");
-  char choice = '\0';
-  bool trainStarted = false;
-  uint8_t trainAddr = 0b1010;
-  int8_t speed = 0;
-  while (choice != 'e') {
-    choice = getChoice();
-    clear();
-    if (choice == '0') {
-      printw("Error: Invalid choice\n\n");
-      continue;
-    }
-    executeChoice(choice, &speed, &trainStarted, trainAddr);
-  }
-}
-
-void executeChoice(char choice, int8_t* speed,
-		   bool* trainStarted, uint8_t trainAddr) {
-  if (choice != ' ' && !*trainStarted) {
-    printw("Error: Train not yet started\n\n");
-    return;
-  }
-  switch (choice) {
-  case ' ':
-    //Check if train is already started
-    if (!*trainStarted) {
-      printw("Starting train..\n");
-    }
-    else {
-      sysHalt();
-      printw("Stopping train..\n");
-    }
-    *trainStarted = !(*trainStarted);
-    break;
-  case 'r':
-    trainRingBell(trainAddr);
-    printw("Ringing the bell..\n");
-    break;
-  case 'w':
-    if (*speed != 5) {
-      *speed += 1;
-      engineSetRelSpeed(trainAddr, *speed);
-      printw("Accelerating the train..\n");
-    }
-    break;
-  case 'm':
-    trainFwdDir(trainAddr);
-    printw("Moving the train..\n");
-    break;
-  case 's':
-    if (*speed != -5) {
-      *speed -= 1;
-      engineSetRelSpeed(trainAddr, *speed);
-      printw("Decelerating the train..\n");
-    }
-    break;
-  case 'e':
-    sysHalt();
-    printw("Exiting program and stopping train..");
-    break;
-  }
-  printw("\n");
-}
+uint8_t speed = 0;
  
 bool isValidChoice(char c) {
-  const char validChoices[11] = {' ', 'R', 'r', 'W', 'w', 'M',
-				 'm', 'S', 's', 'E', 'e'};
-  for (int i = 0; i < 11; ++i) {
+  const char validChoices[] = {' ', 'R', 'r', 'W', 'w', 'M',
+				 'm', 'S', 's', 'E', 'e', 'x', 'X'};
+  for (int i = 0; i < sizeof(validChoices); i) {
     if (c == validChoices[i])
       return true;
   }
@@ -89,10 +29,88 @@ char getChoice() {
   printw("M    : Move the train\n");
   printw("S    : Decelerate the train\n");
   printw("E    : End program\n");
+  printw("Speed: %u\n", speed);
   
   char c = getch();
   if (!isValidChoice(c)) {
-    return '0';
+    return 0;
   }
   return tolower(c);
+}
+
+void executeChoice(char choice, bool* engineStarted, uint8_t engineAddr) {
+  if (choice != ' ' && !*engineStarted) {
+    printw("Error: Train not yet started\n\n");
+    return;
+  }
+  switch (choice) {
+  case ' ':
+    //Check if engine is already started
+    if (!(*engineStarted)) {
+      printw("Starting engine..\n");
+      engineSetAbsSpeed(engineAddr, speed);
+    }
+    else {
+      sysHalt();
+      printw("Stopping engine..\n");
+    }
+    *engineStarted = !(*engineStarted);
+    break;
+  case 'r':
+    engineBlowHorn1(engineAddr);
+    printw("Ringing the bell..\n");
+    break;
+  case 'w':
+    if (speed < 15) {
+      speed++;
+      engineSetAbsSpeed(engineAddr, speed);
+      printw("Accelerating the engine..\n");
+    }
+    break;
+  case 'm':
+    engineFwdDir(engineAddr);
+    printw("Moving the engine..\n");
+    break;
+  case 's':
+    if (speed > 0) {
+      speed--;
+      engineSetAbsSpeed(engineAddr, speed);
+      printw("Decelerating the engine..\n");
+    }
+    break;
+  case 'e':
+    sysHalt();
+    printw("Exiting program and stopping engine..");
+    break;
+  case 'x':
+      engineSetAbsSpeed(engineAddr, 20);
+      break;
+  }
+  printw("\n");
+}
+
+void runTrain() {
+  printw("Starting program..\n\n");
+  char choice = '\0';
+  choice = (!init_serial()) ? 0 : 'e';
+  bool trainStarted = false;
+  uint8_t trainAddr = 23;
+  speed = 5;
+  while (choice != 'e') {
+    choice = getChoice();
+    clear();
+    if (!choice) {
+      printw("Error: Invalid choice\n\n");
+      continue;
+    }
+    executeChoice(choice, &trainStarted, trainAddr);
+  }
+  close_serial();
+}
+
+void startTrain() {
+  initscr();
+  cbreak();
+  runTrain();
+  endwin();
 }

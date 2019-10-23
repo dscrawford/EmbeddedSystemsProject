@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 
 #include "command.h"
 #include "serial.h"
@@ -10,7 +11,7 @@ typedef enum {
     ENGINE,
     TRAIN,
     ACCESSORY,
-    GROUP
+    _GROUP
 } TARGET_TYPE;
 
 bool buildCommand(TARGET_TYPE target, uint_fast8_t address, uint_fast8_t command, uint_fast8_t data);
@@ -725,7 +726,7 @@ bool groupOff(uint8_t addr)
     if(addr > 0x0F) return false; // 4-bit address
     uint8_t command = 0x0; // 00
     uint8_t data = 0x08; // 01000
-    return buildCommand(GROUP, addr, command, data);
+    return buildCommand(_GROUP, addr, command, data);
 }
 
 bool groupOp1(uint8_t addr)
@@ -733,7 +734,7 @@ bool groupOp1(uint8_t addr)
     if(addr > 0x0F) return false; // 4-bit address
     uint8_t command = 0x0; // 00
     uint8_t data = 0x09; // 01001
-    return buildCommand(GROUP, addr, command, data);
+    return buildCommand(_GROUP, addr, command, data);
 }
 
 bool groupOp2(uint8_t addr)
@@ -747,7 +748,7 @@ bool groupOp2(uint8_t addr)
 #else
     uint8_t data = 0x0A; // 01010
 #endif
-    return buildCommand(GROUP, addr, command, data);
+    return buildCommand(_GROUP, addr, command, data);
 }
 
 bool groupOn(uint8_t addr)
@@ -755,7 +756,7 @@ bool groupOn(uint8_t addr)
     if(addr > 0x0F) return false; // 4-bit address
     uint8_t command = 0x0; // 00
     uint8_t data = 0x0B; // 01011
-    return buildCommand(GROUP, addr, command, data);
+    return buildCommand(_GROUP, addr, command, data);
 }
 
 bool groupClear(uint8_t addr)
@@ -763,7 +764,7 @@ bool groupClear(uint8_t addr)
     if(addr > 0x0F) return false; // 4-bit address
     uint8_t command = 0x1; // 01
     uint8_t data = 0x0C; // 01100
-    return buildCommand(GROUP, addr, command, data);
+    return buildCommand(_GROUP, addr, command, data);
 }
 
 
@@ -787,27 +788,30 @@ bool buildCommand(TARGET_TYPE target, uint_fast8_t address, uint_fast8_t command
     toTrain[0] = 0xFE;
 
     switch (target) {
-        case SWITCH_C : {
-            toTrain[1] = (0b01 << 6) + ((address & 0x3F >> 1) & 0x3F);
-        }
-        case ROUTE : {
-            toTrain[1] = (0b1101 << 4) + ((address & 0x0F >> 1) & 0x3F);
-        }
-        case ENGINE: {
-            toTrain[1] = (0b00 << 6) + ((address & 0x3F >> 1) & 0x3F);
-        }
-        case TRAIN: {
-            toTrain[1] = (0b11001 << 3) + ((address & 0x07 >> 1) & 0x3F);
-        }
-        case ACCESSORY: {
-            toTrain[1] = (0b10 << 6) + ((address >> 1) & 0x3F);
-        }
-        case GROUP: {
-            toTrain[1] = (0b1100 << 4) + ((address >> 1) & 0x0F);
-        }
+        case SWITCH_C:
+            toTrain[1] = (0b01 << 6) + (((address & 0x7F) >> 1) & 0x3F);
+            break;
+        case ROUTE:
+            toTrain[1] = (0b1101 << 4) + (((address & 0x1F) >> 1) & 0x0F);
+            break;
+        case ENGINE:
+            toTrain[1] = (0b00 << 6) + (((address & 0x7F) >> 1) & 0x3F);
+            break;
+        case TRAIN:
+            toTrain[1] = (0b11001 << 3) + (((address & 0x0F) >> 1) & 0x07);
+            break;
+        case ACCESSORY:
+            toTrain[1] = (0b10 << 6) + (((address & 0x7F) >> 1) & 0x3F);
+            break;
+        case _GROUP:
+            toTrain[1] = (0b1100 << 4) + (((address & 0x0F) >> 1) & 0x07);
+            break;
+        default:
+            printf("INVALID TARGET: %u\n", target);
+            break;
     }
 
-    toTrain[2] = ((address & 1) << 7) + ((command) & 0x3 << 5) + (data & 0x1F);
+    toTrain[2] = ((address & 0x01) << 7) + ((command & 0x03) << 5) + (data & 0x1F);
 
     return ((send_serial(toTrain)) ? true : false);
 }
