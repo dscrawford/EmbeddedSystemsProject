@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
+
+#ifdef WINDOWS
 #include <windows.h>
 
 #include "serial.h"
@@ -91,7 +93,7 @@ void close_serial () {
  * Send a command over the serial connection
  * Returns bytes sent
  */
-uint32_t send_serial (const char *cmd) {
+uint32_t send_serial (const uint8_t *cmd) {
     uint32_t ret = 0;
 
     printf("Sending command: ");
@@ -109,3 +111,27 @@ uint32_t send_serial (const char *cmd) {
 
     return ret;
 }
+
+#else
+
+int init_serial () {
+    printf("Unix version not implemented...");
+    return 1;
+}
+
+void close_serial () {
+    printf("Unix version not implemented...");
+}
+
+uint32_t send_serial (const uint8_t *cmd) {
+    printf("Sending command: ");
+    printf("%02X", *(cmd + 0));
+    printf("%02X", *(cmd + 1));
+    printf("%02X", *(cmd + 2));
+    printf("\n");
+
+    printf("Unix version not implemented...");
+}
+
+
+#endif

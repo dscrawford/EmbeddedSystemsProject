@@ -17,6 +17,7 @@ ifeq ($(OS),Windows_NT)
 	CFLAGS += -DWINDOWS -DPDC_DLL_BUILD -DHAVE_NO_INFOEX
 	LFLAGS := pdcurses.dll
 	UNIX := 0
+	SHELL := cmd.exe
 else ifeq ($(shell uname -s), Darwin)
 	CFLAGS += -DMACOSX
 	UNIX := 1
@@ -32,7 +33,7 @@ vpath %.h $(shell find $(SRC_DIR) -type d -print | tr '\n' ':')
 
 SRC := $(notdir $(shell find $(SRC_DIR) -name *.c))
 INC := $(addprefix $(INC_DIR)/,$(notdir $(shell find $(SRC_DIR) -name *.h)))
-else ifeq ($(UNIX,0))
+else 
 vpath %.c $(SRC_DIR):$(shell for /F %%G in ('dir /S /B /A:D $(subst /,\,$(SRC_DIR))') do echo %%G:)
 vpath %.h $(SRC_DIR):$(shell for /F %%G in ('dir /S /B /A:D $(subst /,\,$(SRC_DIR))') do echo %%G:)
 
@@ -83,6 +84,9 @@ $(INC_DIR):
 $(OBJ_DIR).dbg:
 	mkdir $(OBJ_DIR).dbg
 
+$(BIN_DIR):
+	mkdir $(BIN_DIR)
+
 $(INC_DIR)/%.h: %.h
 	cp -f $< $@
 
@@ -109,6 +113,9 @@ $(INC_DIR):
 
 $(OBJ_DIR).dbg:
 	mkdir $(subst /,\,$(OBJ_DIR).dbg)
+
+$(BIN_DIR):
+	mkdir $(subst /,\,$(BIN_DIR))
 
 $(INC_DIR)/%.h: %.h
 	copy /Y $< $@

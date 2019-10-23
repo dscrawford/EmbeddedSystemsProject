@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "command.h"
-#include "sereial.h"
+#include "serial.h"
 
 typedef enum {
     SWITCH_C,
