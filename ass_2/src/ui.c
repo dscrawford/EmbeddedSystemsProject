@@ -11,11 +11,16 @@
 #include "ui.h"
 
 uint8_t speed = 0;
+/*
+ * 0: forward
+ * 1: backward
+ */
+unsigned int dir = 0;
  
 bool isValidChoice(char c) {
   const char validChoices[] = {' ', 'R', 'r', 'W', 'w', 'M',
 				 'm', 'S', 's', 'E', 'e', 'x', 'X'};
-  for (int i = 0; i < sizeof(validChoices); i) {
+  for (unsigned int i = 0; i < sizeof(validChoices); i++) {
     if (c == validChoices[i])
       return true;
   }
@@ -26,10 +31,11 @@ char getChoice() {
   printw("Space: Start/Stop the train\n");
   printw("R    : Ring the bell\n");
   printw("W    : Accelerate the train\n");
-  printw("M    : Move the train\n");
+  printw("M    : Change direction of the train\n");
   printw("S    : Decelerate the train\n");
   printw("E    : End program\n");
   printw("Speed: %u\n", speed);
+  printw("Direction: %s\n", ((!dir) ? "forward" : "backward"));
   
   char c = getch();
   if (!isValidChoice(c)) {
@@ -68,8 +74,13 @@ void executeChoice(char choice, bool* engineStarted, uint8_t engineAddr) {
     }
     break;
   case 'm':
-    engineFwdDir(engineAddr);
-    printw("Moving the engine..\n");
+    dir = ~dir;
+    if (dir) {
+        engineRevDir(engineAddr);
+    } else {
+        engineFwdDir(engineAddr);
+    }
+    printw("Changing direction..\n");
     break;
   case 's':
     if (speed > 0) {
