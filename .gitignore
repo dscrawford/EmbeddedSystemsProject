@@ -1,4 +1,4 @@
-/bin
+bin/*
 
 *.o
 *.exe
@@ -8,6 +8,9 @@
 *.tmp
 *.vim
 *~
+
+# Include pdcurses.dll
+!*/bin/pdcurses.dll
 
 
 
