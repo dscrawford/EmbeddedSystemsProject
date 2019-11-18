@@ -1,2 +1,2 @@
 # EmbeddedSystemsProject
-Project for embedded systems CS 4397
+Projects for embedded systems CS 4397
