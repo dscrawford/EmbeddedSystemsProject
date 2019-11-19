@@ -1,0 +1,6 @@
+alias pi='ssh -i ./key pi@192.168.0.107'
+function picp () {
+    if [ $# -eq 1 ]; then
+        scp -i ./key $1 pi@192.168.0.107:~/Dexter/$1
+    fi
+}
