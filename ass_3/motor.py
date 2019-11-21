@@ -30,3 +30,9 @@ def left(turn):
     brick.BP.offset_motor_encoder(brick.BP.PORT_D, brick.BP.get_motor_encoder(brick.BP.PORT_D))  # reset encoder D
     brick.BP.set_motor_position(brick.BP.PORT_D, -(turn / 2))
     brick.BP.set_motor_position(brick.BP.PORT_D, turn / 2)
+
+def us_rotate(degrees):
+    print("ultrasonic motor called")
+    brick.BP.set_motor_position(brick.BP.PORT_C, degrees)
+    
+    
