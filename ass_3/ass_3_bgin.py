@@ -2,7 +2,7 @@
 
 import curses
 
-from motor.py import *
+from motor import *
 
 stdscr = curses.initscr()
 output = curses.newwin(curses.LINES - 4, curses.COLS, 0, 0)
