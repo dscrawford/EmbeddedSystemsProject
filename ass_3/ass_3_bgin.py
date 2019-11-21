@@ -2,7 +2,9 @@
 
 import curses
 
-from motor import *
+import brick
+import motor
+import ultrasonic
 
 stdscr = curses.initscr()
 output = curses.newwin(curses.LINES - 4, curses.COLS, 0, 0)
@@ -13,6 +15,7 @@ curses.noecho()
 curses.curs_set(False)
 output.scrollok(True)
 output.move(0, 0)
+stdscr.nodelay(True)
 stdscr.refresh()
 
 commands.border(curses.ACS_VLINE, curses.ACS_VLINE, curses.ACS_HLINE, curses.ACS_HLINE,
@@ -28,26 +31,33 @@ x += inc
 commands.addstr(2, x, "[M]: enable manual control")
 
 key = 0
+read = 99999
 manual = False
+brick.BP = brick.init()
 while key != ord('q'):
     commands.addstr(1, 1, "Manual control: %s" % ("on " if manual else "off"))
 
     output.refresh()
     commands.refresh()
 
+    read = ultrasonic.us_read(0)
+    if read < 30:
+        #move train
+        read = 29
+
     key = stdscr.getch()
 
     if key == ord('m') or key == ord('M'):
         manual = not manual
     elif manual and (key == ord('w') or key == ord('W')):
-        forward()
+        motor.forward()
     elif manual and (key == ord('a') or key == ord('A')):
-        left(90)
+        motor.left(90)
     elif manual and (key == ord('s') or key == ord('S')):
-        back()
+        motor.back()
     elif manual and (key == ord('d') or key == ord('D')):
-        right(90)
+        motor.right(90)
     elif key == ord(' '):
-        stop()
+        motor.stop()
 
 curses.endwin()
