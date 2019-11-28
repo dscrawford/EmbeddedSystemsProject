@@ -2,9 +2,10 @@ import brick
 import motor
 import time
 
-def us_read():
-    return brick.BP.get_sensor(BP.PORT_3)
-
-def us_read(degrees):
-    motor.us_rotate(degrees)
-    return us_read()
+def us_read(degrees = 0):
+    # motor.us_rotate(degrees)
+    try:
+        value = brick.BP.get_sensor(brick.BP.PORT_3)
+        return value
+    except:
+        return 255

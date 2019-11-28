@@ -1,9 +1,12 @@
 import brickpi3 # import the BrickPi3 drivers
 
-BP
+BP = None
 
 def init():
+    global BP
     BP = brickpi3.BrickPi3()
     BP.set_sensor_type(BP.PORT_3, BP.SENSOR_TYPE.NXT_ULTRASONIC)
-    brick.BP.offset_motor_encoder(brick.BP.PORT_C,brick.BP.get_motor_encoder(brick.BP.PORT_C))
-    return BP
+    # BP.offset_motor_encoder(BP.PORT_C, BP.get_motor_encoder(BP.PORT_C))
+
+def close():
+    BP.reset_all()

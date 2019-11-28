@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import curses
+import time
 
 import brick
 import motor
@@ -18,8 +19,9 @@ output.move(0, 0)
 stdscr.nodelay(True)
 stdscr.refresh()
 
-commands.border(curses.ACS_VLINE, curses.ACS_VLINE, curses.ACS_HLINE, curses.ACS_HLINE,
-    curses.ACS_ULCORNER, curses.ACS_URCORNER, curses.ACS_LLCORNER, curses.ACS_LRCORNER)
+commands.border(curses.ACS_VLINE, curses.ACS_VLINE, curses.ACS_HLINE,
+    curses.ACS_HLINE, curses.ACS_ULCORNER, curses.ACS_URCORNER,
+    curses.ACS_LLCORNER, curses.ACS_LRCORNER)
 inc = int((curses.COLS - 2) / 4)
 x = 1
 commands.addstr(2, x, "[WASD]: direction")
@@ -30,21 +32,33 @@ commands.addstr(2, x, "[Q]: quit")
 x += inc
 commands.addstr(2, x, "[M]: enable manual control")
 
+read = 255
+in_front = 0
 key = 0
-read = 99999
 manual = False
-brick.BP = brick.init()
+brick.init()
 while key != ord('q'):
     commands.addstr(1, 1, "Manual control: %s" % ("on " if manual else "off"))
 
     output.refresh()
     commands.refresh()
 
-    read = ultrasonic.us_read(0)
-    if read < 30:
-        #move train
-        read = 29
+    read = ultrasonic.us_read()
+    # Handle invalid read
+    if read == 255:
+        output.addstr("Invalid Read\n")
+    elif read < 25:
+        in_front += 1
+    else:
+        in_front -= 1 if in_front > 0 else 0
 
+    if in_front >= 5:
+        output.addstr("Train in front\n")
+    elif in_front == 0:
+        output.addstr("Train not in front\n")
+
+    # Wait for input in between loops
+    time.sleep(0.05)
     key = stdscr.getch()
 
     if key == ord('m') or key == ord('M'):
@@ -60,4 +74,5 @@ while key != ord('q'):
     elif key == ord(' '):
         motor.stop()
 
+brick.close()
 curses.endwin()
