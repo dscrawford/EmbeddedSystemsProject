@@ -2,15 +2,19 @@ import time
 
 import brick
 
+# Top speed
 speed = 60
+# Direction of travel
 direction = 1
+# In motion or not
 going = False
 
+# Stops the robot
 def stop():
-    # print("STOP called!")
     global going
     global direction
 
+    # If in motion, taper speed to 0
     if going:
         for i in range(10,-1,-1):
             brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A,
@@ -18,12 +22,12 @@ def stop():
             time.sleep(0.05)
         going = False
 
-
+# Makes the robot go forwards
 def forward():
-    # print("Forward called")
     global going
     global direction
 
+    # If standing still, bring up to speed
     if not going:
         for i in range(11):
             brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A,
@@ -32,12 +36,12 @@ def forward():
         going = True
         direction = 1
 
-
+# Makes the robot go backwards
 def back():
-    # print("back called")
     global going
     global direction
 
+    # If standing still, bring up to speed (but in reverse)
     if not going:
         for i in range(11):
             brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A,
