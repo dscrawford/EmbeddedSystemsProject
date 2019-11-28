@@ -1,6 +1,6 @@
-alias pi='ssh -i ./key pi@192.168.0.104'
+alias pi='ssh -i ./key pi@192.168.0.150'
 function picp () {
     if [ $# -eq 1 ]; then
-        scp -i ./key $1 pi@192.168.0.104:~/Dexter/
+        scp -i ./key $1 pi@192.168.0.150:~/
     fi
 }
