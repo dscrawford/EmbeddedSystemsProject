@@ -64,14 +64,19 @@ while key != ord('q'):
     if key == ord('m') or key == ord('M'):
         manual = not manual
     elif manual and (key == ord('w') or key == ord('W')):
+        output.addstr("Going forwards\n")
+        motor.stop()
         motor.forward()
-    elif manual and (key == ord('a') or key == ord('A')):
-        motor.left(90)
+    # elif manual and (key == ord('a') or key == ord('A')):
+    #     motor.left(90)
     elif manual and (key == ord('s') or key == ord('S')):
+        output.addstr("Going backwards\n")
+        motor.stop()
         motor.back()
-    elif manual and (key == ord('d') or key == ord('D')):
-        motor.right(90)
+    # elif manual and (key == ord('d') or key == ord('D')):
+    #     motor.right(90)
     elif key == ord(' '):
+        output.addstr("Stopping\n")
         motor.stop()
 
 brick.close()
