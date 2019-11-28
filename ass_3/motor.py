@@ -1,20 +1,50 @@
+import time
+
 import brick
 
 speed = 60
+direction = 1
+going = False
 
 def stop():
     # print("STOP called!")
-    brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A, 0)
+    global going
+    global direction
+
+    if going:
+        for i in range(10,-1,-1):
+            brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A,
+                (i / 10) * speed * direction)
+            time.sleep(0.05)
+        going = False
 
 
 def forward():
     # print("Forward called")
-    brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A, speed)
+    global going
+    global direction
+
+    if not going:
+        for i in range(11):
+            brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A,
+                (i / 10) * speed)
+            time.sleep(0.05)
+        going = True
+        direction = 1
 
 
 def back():
     # print("back called")
-    brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A, -speed)
+    global going
+    global direction
+
+    if not going:
+        for i in range(11):
+            brick.BP.set_motor_power(brick.BP.PORT_D + brick.BP.PORT_A,
+                (i / 10) * speed * -1)
+            time.sleep(0.05)
+        going = True
+        direction = -1
 
 
 def right(turn):
