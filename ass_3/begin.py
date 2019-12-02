@@ -23,7 +23,7 @@ stdscr.refresh()
 commands.border(curses.ACS_VLINE, curses.ACS_VLINE, curses.ACS_HLINE,
     curses.ACS_HLINE, curses.ACS_ULCORNER, curses.ACS_URCORNER,
     curses.ACS_LLCORNER, curses.ACS_LRCORNER)
-inc = int((curses.COLS - 2) / 4)
+inc = int((curses.COLS - 2) / 5)
 x = 1
 commands.addstr(2, x, "[WASD]: direction")
 x += inc
@@ -32,11 +32,17 @@ x += inc
 commands.addstr(2, x, "[Q]: quit")
 x += inc
 commands.addstr(2, x, "[M]: enable manual control")
+x += inc
+commands.addstr(2, x, "[R]: reset")
 
 # Keeps track of the ultrasonic sensor reading
-read = 255
+read = 999
+# Keeps track of if the train is in front
+in_front = False
 # Counts how long the train has been in front of the sensor
-in_front = 0
+in_front_count = 0
+# Tracks if the train has crossed the track
+crossed = False
 # Stores keypresses
 key = 0
 # Toggle flag for manual control mode
@@ -51,20 +57,31 @@ while key != ord('q'):
     output.refresh()
     commands.refresh()
 
-    # Get a reading from the ultrasonic sensor
-    read = ultrasonic.us_read()
-    if read == 255:
-        output.addstr("Invalid Read\n")
-    elif read < 25:
-        in_front += 1
-    else:
-        in_front -= 1 if in_front > 0 else 0
+    # Get a reading from the ultrasonic sensor if the train hasn't crossed
+    if not crossed:
+        read = ultrasonic.us_read()
+        output.addstr("%d" % (read))
+        if read == 999:
+            output.addstr("Invalid Read\n")
+        elif read < 60:
+            in_front_count += 1
+            output.addstr("\n")
+        else:
+            in_front_count -= 1 if in_front_count > 0 else 0
+            output.addstr("\n")
 
     # What to do if the train is in front or not
-    if in_front >= 5:
+    if not in_front and in_front_count >= 3:
         output.addstr("Train in front\n")
-    elif in_front == 0:
+        in_front = True
+    elif in_front and in_front_count == 0:
         output.addstr("Train not in front\n")
+        in_front = False
+        # move over tracks
+        motor.forward()
+        time.sleep(2.7)
+        motor.stop()
+        crossed = True
 
     # Wait for input in between loops
     time.sleep(0.05)
@@ -88,6 +105,12 @@ while key != ord('q'):
     elif key == ord(' '):
         output.addstr("Stopping\n")
         motor.stop()
+    elif key == ord('r') or key == ord('R'):
+        # Reset all variables to initial state
+        read = 999
+        in_front = False
+        in_front_count = 0
+        crossed = False
 
 # Closing tasks
 brick.close()

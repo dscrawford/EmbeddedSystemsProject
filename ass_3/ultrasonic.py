@@ -8,4 +8,4 @@ def us_read(degrees = 0):
         value = brick.BP.get_sensor(brick.BP.PORT_3)
         return value
     except:
-        return 255
+        return 999
